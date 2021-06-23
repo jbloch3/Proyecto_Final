@@ -10,18 +10,20 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from bs4 import BeautifulSoup as bs
-import xmltojson
+
 import requests as req
 from zipfile import ZipFile
 import json
 from pyquery import PyQuery
+
+from PIL import Image
 
 import folium
 import folium.plugins
 from folium.plugins import HeatMapWithTime as HMWT
 from folium.plugins import HeatMap as HM
 from folium.plugins import MarkerCluster
-from folium.plugins import FastMarkerCluster
+
 
 import streamlit as st
 
@@ -64,12 +66,24 @@ for i in range(len(df.url)):
         df.url[i] = df.url[i].split('/')[0]
 
 Top10URL = df.url.value_counts()[0:10]
-Top10URL.iplot(kind='bar', xTitle='Country', title='Páginas más visitadas')
+Top10URL_df = pd.DataFrame(Top10URL)
+Top10URL_df_i= Top10URL_df.reset_index()
+Top10URL_df_i = Top10URL_df_i.rename(columns={'index': 'Página', 'url': 'Visitas'})
+
+plt.figure(figsize=(10, 7))
+sns.set_style("darkgrid")
+TopUrl = sns.barplot(data=Top10URL_df_i, x=Top10URL_df_i['Página'], y=Top10URL_df_i.Visitas, palette='pink').set_title('PÁGINAS MÁS VISITADAS')
+plt.xticks(rotation=35)
+
+plt.tight_layout(pad=0)
+
+plt.savefig("TopUrl.png")
 
 df['sopa'] = df.url.apply(lambda x: x.replace('com', '').replace('www', '').replace('es', '')
                            .replace('org', '').strip())
 
-wordcloud = WordCloud(width=1600,height=800, stopwords=juegos, repeat= False, collocations=False).generate(' '.join([e for e in df.sopa]))
+nadena = ['noapnc', 'oainnaci']
+wordcloud = WordCloud(width=1600,height=800, stopwords=nadena, repeat= False, collocations=False).generate(' '.join([e for e in df.sopa]))
 
 plt.figure(figsize=(15, 10), facecolor='k')
 plt.imshow(wordcloud)
@@ -84,15 +98,14 @@ juegos_df = pd.DataFrame(juegos)
 juegos_df['limpio'] = juegos_df.apply(lambda x: x.replace(' ', '_'))
 juegos_df['limpio'] = juegos_df['limpio'].apply(lambda x: x.replace(' ', '_'))
 
-wordcloud = WordCloud(width=1600, height=800, stopwords=juegos, repeat=False,
-                      collocations=False).generate(' '.join([e for e in juegos_df['limpio']]))
+os. chdir(Takeout_dir)
+wordcloud = WordCloud(width=1600,height=800, stopwords=nadena, repeat= False, collocations=False).generate(' '.join([e for e in juegos_df['limpio']]))
 
 plt.figure(figsize=(15, 10), facecolor='k')
 plt.imshow(wordcloud)
 plt.axis('off')
 plt.tight_layout(pad=0)
-plt.savefig('wordcloud.png', facecolor='k', bbox_inches='tight')
-plt.show()
+plt.savefig('juegos.jpg', facecolor='k', bbox_inches='tight')
 
 os. chdir(Takeout_dir)
 r = open(Takeout_dir + '/' + 'Maps (Tus sitios)' +'/'+'Reseñas.json')
@@ -127,7 +140,7 @@ df_peliculas = pd.DataFrame(peliculas_json['ratings'])
 
 html = open(Takeout_dir + '/YouTube y YouTube Music/historial/historial-de-reproducciones.html', 'r').read() # local html
 
-qet_page_conet_page_conet_page_conuery = PyQuery(html)
+query = PyQuery(html)
 lst= []
 for i in range(2000):
     try:
@@ -140,7 +153,16 @@ youtube
 youtube[0] = youtube[0].apply(lambda x: x.replace(' ', '_').replace('com', '').replace('www', '').replace('es', '')
                            .replace('org', '').replace('https', '').strip())
 canales = youtube.value_counts()[0:10]
-canales.iplot(kind='bar', xTitle='Canales Youtube', title='Canales de Youtube más visitados (Últimos 1000)')
+TopCanales_df = pd.DataFrame(canales, columns= ['Visitas'])
+TopCanales_df_i= TopCanales_df.reset_index()
+TopCanales_df_i = TopCanales_df_i.rename(columns={0: 'Canal'})
+
+plt.figure(figsize=(10, 7))
+sns.set_style("darkgrid")
+YTcanales = sns.barplot(data=Top10URL_df_i, x=TopCanales_df_i['Canal'], y=TopCanales_df_i.Visitas, palette='pink').set_title('CANALES MÁS VISITADOS ÚLTIMAMENTE')
+plt.xticks(rotation=35)
+plt.tight_layout(pad=0)
+plt.savefig("YTcanales.png")
 
 os.chdir(Takeout_dir + '/' + 'Mi actividad' +'/'+'Voz y Audio')
 audios = os.listdir()
@@ -189,16 +211,39 @@ for i in range(len(df_loc)):
         icon=folium.Icon(color='green', icon='check', prefix='fa'),
     ).add_to(marker_cluster)
 
+os.chdir(cwd)
+
 st.write("""
-# Simple Iris Flower Prediction App
-This app predicts the **Iris flower** type!
+#Tu Google Takeout 
 """)
 
+st.text('Hola' + nombre + '''En esta nueva era en la que vivimos, los datos son el nuevo petroleo.
+ La información es poder y de alguna forma la información que tienen las grandes empresas sobre 
+ nosotros es poder sobre nosotros. Veamos algunas de las cosas que sabe Google sobre ti: ''')
 
+st.write("""
+## Google conoce las páginas que visitas... 
+""")
 
+col1, col2 = st.beta_columns(2)
+with col1:
+    imagen = Image.open("Takeout/TopUrl.png")
+    st.image(imagen, use_column_width=True)
+with col2:
+    imagen = Image.open("Takeout/wordcloud.png")
+    st.image(imagen, use_column_width=True)
 
+st.write("""
+## Sabe lo que te gusta ver en YouTube... 
+""")
 
+imagen = Image.open("Takeout/YTcanales.png")
+st.image(imagen, use_column_width=True)
 
-
+st.write("""
+## Sabe a que juegas... 
+""")
+imagen = Image.open("Takeout/juegos.jpg")
+st.image(imagen, use_column_width=True)
 
 
