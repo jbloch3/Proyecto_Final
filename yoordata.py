@@ -174,16 +174,14 @@ ind = np.random.randint(0,len(audios))
 ind1 = np.random.randint(0,len(audios)) #Indices aleatorios para sacar audios aleatorios 
 ind2 = np.random.randint(0,len(audios))
 ind3 = np.random.randint(0,len(audios))
-import vlc
-p = vlc.MediaPlayer(Takeout_dir + '/' + 'Mi actividad' +'/'+'Voz y Audio' + '/'+ audios[ind])
-p.play()
+
 
 os.chdir(Takeout_dir + '/' + 'Historial de ubicaciones' +'/'+'Semantic Location History')
 años = os.listdir()
 x = open(Takeout_dir + '/' + 'Historial de ubicaciones' +'/'+'Semantic Location History/2016/2016_OCTOBER.json')
 prueba_json = json.load(x)
 
-lst= []
+lst= []   #Hacemos una lista de tuplas con 
 for i in años:
     os.chdir(Takeout_dir + '/' + 'Historial de ubicaciones' +'/'+'Semantic Location History/' + i)
     meses = os.listdir()   
@@ -192,11 +190,11 @@ for i in años:
         prueba_json = json.load(x)
         for k in range(len(prueba_json['timelineObjects'])):
             try:
-                lst.append((prueba_json['timelineObjects'][k]['placeVisit']['location']['latitudeE7'], prueba_json['timelineObjects'][k]['placeVisit']['location']['longitudeE7'], j))
+                lst.append((prueba_json['timelineObjects'][k]['placeVisit']['location']['latitudeE7'], prueba_json['timelineObjects'][k]['placeVisit']['location']['longitudeE7'], prueba_json['timelineObjects'][k]['placeVisit']['location']['name'],  j))
             except:
                 pass
 
-df_loc = pd.DataFrame(lst, columns = ['lat', 'lon', 'date'])
+df_loc = pd.DataFrame(lst, columns = ['lat', 'lon', 'name', 'date'])
 df_loc['lat'] = df_loc['lat'].apply(lambda x: x / 10000000)
 df_loc['lon'] = df_loc['lon'].apply(lambda x: x / 10000000)
 
@@ -212,14 +210,14 @@ marker_cluster = MarkerCluster().add_to(l)
 for i in range(len(df_loc)):
     folium.Marker(
         location= [df_loc.lat[i], df_loc.lon[i]],
-        popup=df_loc.date[i],
+        popup=df_loc.name[i] + ' ('+ str(df_loc.month[i]) + '-'+ str(df_loc.year[i])+ ')',
         icon=folium.Icon(color='green', icon='check', prefix='fa'),
     ).add_to(marker_cluster)
 
 os.chdir(cwd)
 
 st.write("""
-# Tu Google Takeout 
+# Tu Google Takeout by Yoordata
 """)
 
 st.text('Hola ' + nombre + '''. En esta nueva era en la que vivimos, los datos son el nuevo petroleo.
@@ -265,7 +263,7 @@ folium_static(l)
 
 st.write("""
 ## Escucha atentemente a lo que dices...
-Aquí tienes una muestra aleatoria de algunoas de tus peticiones a Google:
+...aquí tienes una muestra aleatoria de algunoas de tus peticiones a Google:
 """)
 
 
