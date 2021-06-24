@@ -171,6 +171,9 @@ audios = os.listdir()
 os.chdir(Takeout_dir)
 
 ind = np.random.randint(0,len(audios))
+ind1 = np.random.randint(0,len(audios)) #Indices aleatorios para sacar audios aleatorios 
+ind2 = np.random.randint(0,len(audios))
+ind3 = np.random.randint(0,len(audios))
 import vlc
 p = vlc.MediaPlayer(Takeout_dir + '/' + 'Mi actividad' +'/'+'Voz y Audio' + '/'+ audios[ind])
 p.play()
@@ -228,24 +231,24 @@ st.write("""
 """)
 
 
-imagen = Image.open("Takeout/TopUrl.png")
-st.image(imagen, use_column_width=True)
-
-st.write("""
-## Y cuanto las visitas:
-""")
 imagen = Image.open("Takeout/wordcloud.png")
 st.image(imagen, use_column_width=True)
 
 st.write("""
-## Sabe lo que te gusta ver en YouTube: 
+## Y cuanto las visitas...
+""")
+imagen = Image.open("Takeout/TopUrl.png")
+st.image(imagen, use_column_width=True)
+
+st.write("""
+## Sabe lo que te gusta ver en YouTube...
 """)
 
 imagen = Image.open("Takeout/YTcanales.png")
 st.image(imagen, use_column_width=True)
 
 st.write("""
-## Sabe a que juegas con el movil: 
+## Sabe a que juegas con el movil...
 """)
 imagen = Image.open("Takeout/juegos.jpg")
 st.image(imagen, use_column_width=True)
@@ -256,15 +259,31 @@ st.write("""
 folium_static(m)
 
 st.write("""
-## Sabe dónde estás en todo momento:
+## Sabe dónde estás en todo momento...
 """)
 folium_static(l)
 
 st.write("""
-## Escucha atentemente a lo que dices:
+## Escucha atentemente a lo que dices...
+Aquí tienes una muestra aleatoria de algunoas de tus peticiones a Google:
 """)
 
 
 audio_file = open(Takeout_dir + '/' + 'Mi actividad' +'/'+'Voz y Audio' + '/'+ audios[ind], 'rb')
 audio_bytes = audio_file.read()
 st.audio(audio_bytes, format='audio/ogg')
+
+audio_file = open(Takeout_dir + '/' + 'Mi actividad' +'/'+'Voz y Audio' + '/'+ audios[ind1], 'rb')
+audio_bytes = audio_file.read()
+st.audio(audio_bytes, format='audio/ogg')
+
+audio_file = open(Takeout_dir + '/' + 'Mi actividad' +'/'+'Voz y Audio' + '/'+ audios[ind2], 'rb')
+audio_bytes = audio_file.read()
+st.audio(audio_bytes, format='audio/ogg')
+
+audio_file = open(Takeout_dir + '/' + 'Mi actividad' +'/'+'Voz y Audio' + '/'+ audios[ind3], 'rb')
+audio_bytes = audio_file.read()
+st.audio(audio_bytes, format='audio/ogg')
+
+
+
